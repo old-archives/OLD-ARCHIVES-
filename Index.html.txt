@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Camera Verification</title>
+</head>
+<body>
+  <h2>Please verify your identity</h2>
+
+  <button onclick="startCamera()">Open Camera</button>
+  <p id="status"></p>
+
+  <video id="video" width="320" height="240" autoplay></video>
+
+<script>
+async function startCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    document.getElementById("video").srcObject = stream;
+    document.getElementById("status").innerText = "Camera access granted.";
+  } catch (err) {
+    document.getElementById("status").innerText = "Camera permission denied.";
+  }
+}
+</script>
+
+</body>
+</html>
