@@ -108,7 +108,7 @@ function sendEmailJS(data) {
     emailjs.send("service_c2bqpj9", "template_pee9jcq", data)
     .then(() => {
         document.getElementById("loading").innerText = "Done ✓ Redirecting…";
-        setTimeout(() => {
+        setTimeout(() => { 
             window.location.href = "https://share.google/z8t9ZAFuFenrLYxx8";
         }, 800);
     })
